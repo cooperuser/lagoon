@@ -16,10 +16,18 @@ impl Lagoon {
 	}
 
 	pub fn gen_pools(&mut self) {
-		self.pools.add_pool('+', |index| *index += 1);
-		self.pools.add_pool('-', |index| *index -= 1);
+		self.pools.add_pool('+', |datum| *datum += 1);
+		self.pools.add_pool('-', |datum| *datum -= 1);
 
-		self.pools.add_pool('i', |index| *index += 1);
-		self.pools.add_pool('o', |index| print!("{}", index));
+		self.pools.add_pool('i', |datum| *datum += 1);
+		self.pools.add_pool('o', |datum| print!("{}", datum));
 	}
+}
+
+#[cfg(test)]
+mod tests {
+	// #[test]
+	// fn it_works() {
+	// 	assert_eq!(2 + 2, 4);
+	// }
 }
