@@ -1,19 +1,14 @@
 #![allow(dead_code)]
 pub mod pool;
 pub mod parser;
+pub mod tree;
 
 pub struct Lagoon {
-	pub pools: pool::Pools<i32>,
-	parser: parser::Parser
+	pub pools: pool::Pools<i32>
 }
 
 impl Lagoon {
-	pub fn new() -> Self {
-		Self {
-			pools: pool::Pools::new(),
-			parser: parser::Parser::new()
-		}
-	}
+	pub fn new() -> Self { Self { pools: pool::Pools::new() } }
 
 	pub fn gen_pools(&mut self) {
 		self.pools.add_pool('+', |datum| *datum += 1);
