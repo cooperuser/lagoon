@@ -1,6 +1,6 @@
 use std::str::Chars;
 
-use super::tree::{Guard, Node, Tree};
+use super::tree::{Guard, Tree};
 use super::tree::factory::*;
 
 pub fn parse(input: String) -> Tree {
@@ -58,22 +58,6 @@ fn find_guard(chars: &mut Chars<'_>, mut _line: i32) -> Vec<Guard> {
 		}
 	}
 	return guards;
-}
-
-pub fn debug(tree: Tree) -> String {
-	let mut output = String::new();
-	output.push('(');
-	let mut first = true;
-	for n in tree.nodes {
-		if first { first = false; }
-		else { output.push_str(", "); }
-		match n {
-			Node::Symbol(s) => output.push_str(&s.text),
-			Node::Loop(l) => output.push_str(&debug(l.tree))
-		}
-	}
-	output.push(')');
-	output
 }
 
 #[cfg(test)]
