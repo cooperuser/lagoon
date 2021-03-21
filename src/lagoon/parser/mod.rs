@@ -1,7 +1,9 @@
+pub mod tree;
+
 use std::str::Chars;
 
-use super::tree::{Guard, Tree};
-use super::tree::factory::*;
+use tree::{Guard, Tree};
+use tree::factory::*;
 
 pub fn parse(input: String) -> Tree {
 	let tree: Tree = Tree::empty();
@@ -62,8 +64,8 @@ fn find_guard(chars: &mut Chars<'_>, mut _line: i32) -> Vec<Guard> {
 
 #[cfg(test)]
 mod simple {
-	use crate::lagoon::parser::parse;
-	use crate::lagoon::tree::factory::*;
+	use super::parse;
+	use super::tree::factory::*;
 
 	#[test]
 	fn single() {
@@ -94,8 +96,8 @@ mod simple {
 
 #[cfg(test)]
 mod advanced {
-	use crate::lagoon::parser::parse;
-	use crate::lagoon::tree::factory::*;
+	use super::parse;
+	use super::tree::factory::*;
 
 	#[test]
 	fn nested() {

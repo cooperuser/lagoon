@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 pub mod pool;
 pub mod parser;
-pub mod tree;
+pub mod interpreter;
 
 pub struct Lagoon {
 	pub pools: pool::Pools<i32>
