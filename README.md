@@ -1,5 +1,7 @@
 # lagoon
 
+![Lagoon](./img/lagoon.png)
+
 ## Outline
 
 Lagoon is an esoteric programming language built around the idea of `pools`,
