@@ -1,10 +1,12 @@
-mod expression;
+pub mod expression;
 
 use std::{hash::Hash, str::FromStr};
 use super::parser::tree::{Node, Tree};
 use self::expression::{Closure, Expression};
 
-pub fn interpret<T: Eq + Hash + FromStr + Default>(tree: Tree) -> Closure<T> {
+pub fn interpret<T: Eq + Hash + Copy + FromStr + Default>(
+	tree: Tree
+) -> Closure<T> {
 	let mut closure: Closure<T> = Closure {parts: Vec::new()};
 	for n in tree.nodes {
 		closure.parts.push(rinterpret::<T>(&n));
@@ -12,7 +14,9 @@ pub fn interpret<T: Eq + Hash + FromStr + Default>(tree: Tree) -> Closure<T> {
 	return closure;
 }
 
-fn rinterpret<T: Eq + Hash + FromStr + Default>(node: &Node) -> Expression<T> {
+fn rinterpret<T: Eq + Hash + Copy + FromStr + Default>(
+	node: &Node
+) -> Expression<T> {
 	use self::expression::factory::*;
 
 	match node {

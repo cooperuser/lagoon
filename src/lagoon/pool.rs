@@ -3,7 +3,7 @@ use std::hash::Hash;
 
 pub struct Pool<T: Eq + Hash> {
 	pub func: fn(&mut i32),
-	set: HashSet<T>
+	pub set: HashSet<T>
 }
 
 impl<T: Eq + Hash> Pool<T> {
@@ -42,7 +42,7 @@ impl<T: Eq + Hash> Pool<T> {
 
 pub struct Pools<T: Eq + Hash> {
 	pub count: i32,
-	map: HashMap<char, Pool<T>>
+	pub map: HashMap<char, Pool<T>>
 }
 
 impl<T: Eq + Hash> Pools<T> {
@@ -64,10 +64,30 @@ impl<T: Eq + Hash> Pools<T> {
 	/// ```
 	///
 	/// temp
-	pub fn add_pool(&mut self, identifier: char, func: fn(&mut i32)) -> &mut Self {
+	pub fn add_pool(
+		&mut self,
+		identifier: char,
+		func: fn(&mut i32)
+	) -> &mut Self {
 		// if self.map.contains_key(&identifier) { /* Error */ }
 		self.map.insert(identifier, Pool::new(func));
 		return self;
+	}
+
+	pub fn get_pool(
+		&mut self,
+		identifier: char
+	) -> Result<&mut Pool<T>, &'static str> {
+		match self.map.get_mut(&identifier) {
+			Some(p) => Ok(p),
+			None => Err("invalid")
+		}
+	}
+
+	pub fn execute(self, memory: &mut HashMap<T, i32>) {
+		for (_, pool) in self.map {
+			pool.execute(memory);
+		}
 	}
 }
 
