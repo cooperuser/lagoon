@@ -99,4 +99,16 @@ mod full {
 		assert_eq!(lagoon.memory.get(&1).unwrap_or(&0), &0);
 		assert_eq!(lagoon.memory.get(&2).unwrap_or(&0), &0);
 	}
+
+	#[test]
+	fn multiplication() {
+		let mut lagoon: Lagoon<i32> = Lagoon::new();
+		lagoon.gen_pools();
+		lagoon.append_raw("0+1+;;;0+;1+{0|0-;0-2+1-{1|;}2+1-2-1+3+{2|;}2-1+3+}");
+		execute(&mut lagoon.memory, &mut lagoon.pools, lagoon.code);
+		assert_eq!(lagoon.memory.get(&0).unwrap_or(&0), &0);
+		assert_eq!(lagoon.memory.get(&1).unwrap_or(&0), &4);
+		assert_eq!(lagoon.memory.get(&2).unwrap_or(&0), &0);
+		assert_eq!(lagoon.memory.get(&3).unwrap_or(&0), &12);
+	}
 }
