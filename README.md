@@ -103,12 +103,12 @@ Or, for a more complicated example, take multiplication:
 
 ## Credit
 
-The idea for this esoteric language primarily came from my college friend
-Cullen LaKemper ([@SangerC](https://github.com/SangerC)). After weeks of
-bugging my friends to attempt designing an esolang, he was the first to do so.
-After that we both decided to brainstorm ideas for the language. Cullen gets
-all the credit for the amazing name choice!  He and I both decided to write our
-implementations in Rust, and well, this is mine.
+The idea for Lagoon came primarily from my college friend Cullen LaKemper
+([@SangerC](https://github.com/SangerC)). After weeks of bugging my friends to
+attempt designing an esolang, he was the first to do so.  After that we both
+decided to brainstorm ideas for the language. Cullen gets all the credit for
+the amazing name choice!  He and I both decided to write our implementations in
+Rust, and well, this is mine.
 
 [Here](https://github.com/SangerC/lagoonlanguage) is Cullen's implemenation in
 Python. (link to Rust repo coming soon)
