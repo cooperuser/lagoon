@@ -4,7 +4,7 @@ use std::{hash::Hash, str::FromStr};
 use super::parser::tree::{Node, Tree};
 use self::expression::{Closure, Expression};
 
-pub fn interpret<T: Eq + Hash + Copy + FromStr + Default>(
+pub fn interpret<T: Eq + Hash + Clone + FromStr + Default>(
 	tree: Tree
 ) -> Closure<T> {
 	let mut closure: Closure<T> = Closure {parts: Vec::new()};
@@ -14,7 +14,7 @@ pub fn interpret<T: Eq + Hash + Copy + FromStr + Default>(
 	return closure;
 }
 
-fn rinterpret<T: Eq + Hash + Copy + FromStr + Default>(
+fn rinterpret<T: Eq + Hash + Clone + FromStr + Default>(
 	node: &Node
 ) -> Expression<T> {
 	use self::expression::factory::*;

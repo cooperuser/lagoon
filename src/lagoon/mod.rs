@@ -5,7 +5,7 @@ pub mod parser;
 pub mod interpreter;
 pub mod executor;
 
-use std::{collections::HashMap, hash::Hash};
+use std::{collections::HashMap, hash::Hash, str::FromStr};
 use interpreter::expression::{Closure, factory::new_closure};
 
 pub struct Lagoon<T: Eq + Hash + Clone> {
@@ -14,7 +14,7 @@ pub struct Lagoon<T: Eq + Hash + Clone> {
 	pub code: Closure<T>
 }
 
-impl<T: Eq + Hash + Clone> Lagoon<T> {
+impl<T: Eq + Hash + Clone + Default + FromStr> Lagoon<T> {
 	pub fn new() -> Self {
 		Self {
 			memory: HashMap::new(),
@@ -30,23 +30,28 @@ impl<T: Eq + Hash + Clone> Lagoon<T> {
 		self.pools.add_pool('i', |datum| *datum += 1);
 		self.pools.add_pool('o', |datum| print!("{}", datum));
 	}
+
+	pub fn append(&mut self, input: String) {
+		let tree = parser::parse(input);
+		let mut closure = interpreter::interpret(tree);
+		self.code.parts.append(&mut closure.parts);
+	}
+
+	pub fn append_raw(&mut self, input: &str) {
+		self.append(input.to_string());
+	}
 }
 
 #[cfg(test)]
-mod manual {
+mod full {
 	use super::Lagoon;
-	use super::interpreter::expression::factory as e;
 	use super::executor::execute;
 
 	#[test]
 	fn simple() {
 		let mut lagoon: Lagoon<i32> = Lagoon::new();
 		lagoon.gen_pools();
-		let program = e::new_closure(vec![
-			e::new_instruction(0, '+'),
-			e::new_exec()
-		]);
-		lagoon.code = program;
+		lagoon.append_raw("0+;");
 		assert_eq!(lagoon.memory.get(&0).unwrap_or(&0), &0);
 		execute(&mut lagoon.memory, &mut lagoon.pools, lagoon.code);
 		assert_eq!(lagoon.memory.get(&0).unwrap_or(&0), &1);
@@ -56,13 +61,7 @@ mod manual {
 	fn toggle_index() {
 		let mut lagoon: Lagoon<i32> = Lagoon::new();
 		lagoon.gen_pools();
-		let program = e::new_closure(vec![
-			e::new_instruction(0, '+'),
-			e::new_instruction(0, '+'),
-			e::new_instruction(1, '+'),
-			e::new_exec()
-		]);
-		lagoon.code = program;
+		lagoon.append_raw("0+0+1+;");
 		assert_eq!(lagoon.memory.get(&0).unwrap_or(&0), &0);
 		assert_eq!(lagoon.memory.get(&1).unwrap_or(&0), &0);
 		execute(&mut lagoon.memory, &mut lagoon.pools, lagoon.code);
@@ -74,19 +73,7 @@ mod manual {
 	fn simple_loop() {
 		let mut lagoon: Lagoon<i32> = Lagoon::new();
 		lagoon.gen_pools();
-		let program = e::new_closure(vec![
-			e::new_instruction(0, '+'),
-			e::new_exec(),
-			e::new_exec(),
-			e::new_exec(),
-			e::new_instruction(0, '+'),
-			e::new_instruction(0, '-'),
-			e::new_instruction(1, '+'),
-			e::new_loop(vec![e::new_guard(0, false)], e::new_closure(vec![
-				e::new_exec()
-			]))
-		]);
-		lagoon.code = program;
+		lagoon.append_raw("0+;;;0+0-1+{0|;}");
 		execute(&mut lagoon.memory, &mut lagoon.pools, lagoon.code);
 		assert_eq!(lagoon.memory.get(&0).unwrap_or(&0), &0);
 		assert_eq!(lagoon.memory.get(&1).unwrap_or(&0), &3);
@@ -96,22 +83,7 @@ mod manual {
 	fn negated_loop() {
 		let mut lagoon: Lagoon<i32> = Lagoon::new();
 		lagoon.gen_pools();
-		let program = e::new_closure(vec![
-			e::new_instruction(0, '+'),
-			e::new_exec(),
-			e::new_exec(),
-			e::new_exec(),
-			e::new_instruction(0, '+'),
-			e::new_instruction(0, '-'),
-			e::new_instruction(1, '+'),
-			e::new_loop(vec![
-				e::new_guard(0, false),
-				e::new_guard(1, true)
-			], e::new_closure(vec![
-				e::new_exec()
-			]))
-		]);
-		lagoon.code = program;
+		lagoon.append_raw("0+;;;0+0-1+{0,!1|;}");
 		execute(&mut lagoon.memory, &mut lagoon.pools, lagoon.code);
 		assert_eq!(lagoon.memory.get(&0).unwrap_or(&0), &2);
 		assert_eq!(lagoon.memory.get(&1).unwrap_or(&0), &1);
@@ -121,41 +93,10 @@ mod manual {
 	fn nested_loop() {
 		let mut lagoon: Lagoon<i32> = Lagoon::new();
 		lagoon.gen_pools();
-		let program = e::new_closure(vec![
-			e::new_instruction(1, '+'),
-			e::new_exec(),
-			e::new_exec(),
-			e::new_exec(),
-			e::new_instruction(1, '+'),
-
-			e::new_loop(vec![e::new_guard(1, false)], e::new_closure(vec![
-				e::new_instruction(1, '-'),
-				e::new_exec(),
-				e::new_instruction(1, '-'),
-
-				e::new_instruction(2, '+'),
-				e::new_exec(),
-				e::new_exec(),
-				e::new_exec(),
-				e::new_instruction(2, '+'),
-
-				e::new_instruction(2, '-'),
-				e::new_loop(vec![e::new_guard(2, false)], e::new_closure(vec![
-					e::new_instruction(0, '+'),
-					e::new_exec(),
-					e::new_instruction(0, '+'),
-				])),
-				e::new_instruction(2, '-'),
-			]))
-		]);
-		lagoon.code = program;
+		lagoon.append_raw("1+;;;1+{1|1-;1- 2+;;;2+ 2-{2|0+;0+}2-}");
 		execute(&mut lagoon.memory, &mut lagoon.pools, lagoon.code);
 		assert_eq!(lagoon.memory.get(&0).unwrap_or(&0), &9);
 		assert_eq!(lagoon.memory.get(&1).unwrap_or(&0), &0);
 		assert_eq!(lagoon.memory.get(&2).unwrap_or(&0), &0);
 	}
-}
-
-#[cfg(test)]
-mod program {
 }
